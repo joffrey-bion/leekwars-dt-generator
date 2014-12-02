@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.jbion.leekwars.model.Chip;
 import com.jbion.leekwars.model.Weapon;
+import com.jbion.leekwars.utils.PrintUtils;
 
 public class Main {
     
@@ -21,9 +22,8 @@ public class Main {
         chips.add(Chip.SPARK);
         //chips.add(Chip.ICE);
         
-        Optimizer opt = new Optimizer();
-        opt.optimize(maxTP, weapons, chips);
-        
+        Optimizer opt = new Optimizer(weapons, chips);
+        opt.optimize(maxTP);
     }
 
 }

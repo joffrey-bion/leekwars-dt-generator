@@ -93,4 +93,8 @@ public abstract class Item {
     public String toString() {
         return name;
     }
+
+    public int getCooldown() {
+        return 0;
+    }
 }

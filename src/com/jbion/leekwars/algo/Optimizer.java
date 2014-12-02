@@ -1,125 +1,117 @@
 package com.jbion.leekwars.algo;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.jbion.leekwars.algo.data.AttackPlan;
+import com.jbion.leekwars.algo.data.AttackPlansSet;
+import com.jbion.leekwars.algo.data.TPMap;
 import com.jbion.leekwars.model.Chip;
 import com.jbion.leekwars.model.Item;
 import com.jbion.leekwars.model.Weapon;
 
 public class Optimizer {
 
+    private List<Weapon> weapons;
     private List<Item> items;
-    private Map<Integer, List<ItemList>> itemListsCache;
+    private Map<Integer, AttackPlansSet> allPlansSets;
 
-    private Map<Weapon, Map<Integer, List<ItemList>>> itemListsByTPByWeapon;
+    private Map<Weapon, TPMap> plansSetsByTPByWeapon;
 
-    public void optimize(int maxTP, List<Weapon> weapons, List<Chip> chips) {
+    public Optimizer(List<Weapon> weapons, List<Chip> chips) {
+        this.weapons = weapons;
         this.items = new ArrayList<>();
         items.addAll(weapons);
         items.addAll(chips);
+        allPlansSets = new HashMap<>();
+        plansSetsByTPByWeapon = new HashMap<>(weapons.size());
+    }
 
-        itemListsCache = new HashMap<>(maxTP);
-        for (int tp = 1; tp <= maxTP; tp++) {
-            itemListsCache.put(tp, getItemListsForTP(tp));
-        }
-        removeDuplicates(itemListsCache.values());
+    public void optimize(int maxTP) {
 
-        for (int tp = 1; tp <= maxTP; tp++) {
-            System.out.println(tp + " TP: " + itemListsCache.get(tp));
-        }
+        initializePlansSets(maxTP);
 
-        itemListsByTPByWeapon = new HashMap<>(weapons.size());
+        System.out.println(allPlansSets);
+
+        sortByWeaponEquipped(maxTP);
+
         for (Weapon equippedWeapon : weapons) {
-            Map<Integer, List<ItemList>> itemListsByTP = new HashMap<>(maxTP);
-            for (int tp = 1; tp <= maxTP; tp++) {
-                itemListsByTP.put(tp, new ArrayList<>());
-            }
-            itemListsCache.values().stream().flatMap(List::stream).forEach(list -> {
-                int tp = list.getTpCost(equippedWeapon);
-                if (tp <= maxTP) {
-                    itemListsByTP.get(tp).add(list);
-                }
-            });
-            removeDuplicates(itemListsByTP.values());
-            clearUninterestingSets(maxTP, itemListsByTP);
-            itemListsByTPByWeapon.put(equippedWeapon, itemListsByTP);
-
+            TPMap plansByTP = plansSetsByTPByWeapon.get(equippedWeapon);
             System.out.println("\nFor Equipped Weapon " + equippedWeapon);
-            for (int tp = 1; tp <= maxTP; tp++) {
-                System.out.println(tp + " TP: " + itemListsByTP.get(tp));
-            }
+            System.out.println(plansByTP);
+            plansByTP.normalize();
+            System.out.println("\n=> NORMALIZED");
+            System.out.println(plansByTP);
         }
     }
 
     /**
-     * Returns the list of all item lists costing exactly tp (ignoring weapon change).
+     * Enumerates and stores all {@link AttackPlansSet}s for the given maximum of TP.
+     * 
+     * @param maxTP
+     *            the maximum turn points available
+     */
+    private void initializePlansSets(int maxTP) {
+        allPlansSets.clear();
+        for (int tp = 1; tp <= maxTP; tp++) {
+            allPlansSets.put(tp, getPlansSetForTP(tp));
+        }
+    }
+
+    /**
+     * Returns the set of {@link AttackPlan}s costing exactly tp (ignoring weapon change).
      * 
      * @param tp
-     *            the number of turn points the item lists should cost
-     * @return a new (or cached) list of item lists, guaranteed to cost tp.
+     *            the number of turn points the {@link AttackPlan}s should cost
+     * @return a new (or cached) set of {@link AttackPlan}s, guaranteed to cost tp (ignoring weapon
+     *         change).
      */
-    private List<ItemList> getItemListsForTP(int tp) {
-        if (itemListsCache.get(tp) != null) {
-            return itemListsCache.get(tp);
+    private AttackPlansSet getPlansSetForTP(int tp) {
+        if (allPlansSets.get(tp) != null) {
+            return allPlansSets.get(tp);
         }
-        List<ItemList> itemLists = new ArrayList<>();
+        AttackPlansSet plansSet = new AttackPlansSet();
         for (Item item : items) {
             if (tp < item.getTPCost()) {
                 continue;
             }
             if (tp == item.getTPCost()) {
-                ItemList list = new ItemList();
-                list.add(item);
-                itemLists.add(list);
+                AttackPlan plan = new AttackPlan();
+                if (plan.add(item)) {
+                    plansSet.add(plan);
+                }
                 continue;
             }
-            List<ItemList> subLists = getItemListsForTP(tp - item.getTPCost());
-            for (ItemList subList : subLists) {
-                ItemList list = new ItemList();
-                list.addAll(subList);
-                list.add(item);
-                itemLists.add(list.stream().sorted(Comparator.comparingInt(Item::getTPCost))
-                        .collect(ItemList.getCollector()));
-            }
-        }
-        return itemLists;
-    }
-
-    private static void removeDuplicates(Collection<List<ItemList>> collection) {
-        Set<ItemList> temp = new HashSet<>();
-        for (List<ItemList> itemListsList : collection) {
-            temp.addAll(itemListsList);
-            itemListsList.clear();
-            for (ItemList list : temp) {
-                if (!itemListsList.contains(list)) {
-                    itemListsList.add(list);
+            AttackPlansSet subPlansSet = getPlansSetForTP(tp - item.getTPCost());
+            for (AttackPlan subPlan : subPlansSet) {
+                AttackPlan plan = new AttackPlan();
+                plan.addAll(subPlan);
+                if (plan.add(item)) {
+                    plansSet.add(plan);
                 }
             }
-            temp.clear();
+        }
+        return plansSet;
+    }
+
+    private void sortByWeaponEquipped(int maxTP) {
+        plansSetsByTPByWeapon.clear();
+        for (Weapon equippedWeapon : weapons) {
+            TPMap tpMap = new TPMap(maxTP);
+            allPlansSets.values().stream().flatMap(Set::stream).forEach(plan -> {
+                int tp = plan.getTpCost(equippedWeapon);
+                if (tp <= maxTP) {
+                    tpMap.addPlan(tp, plan);
+                }
+            });
+            plansSetsByTPByWeapon.put(equippedWeapon, tpMap);
         }
     }
 
-    private static void clearUninterestingSets(int maxTP, Map<Integer, List<ItemList>> itemListsByTP) {
-        int maxDamage = 0;
-        for (int tp = 1; tp <= maxTP; tp++) {
-            List<ItemList> itemListsList = itemListsByTP.get(tp);
-
-            for (ItemList list : itemListsList) {
-                maxDamage = Math.max(maxDamage, list.getAverageDamage());
-            }
-            final int finalMaxDamage = maxDamage;
-            itemListsList.removeIf(list -> list.getAverageDamage() < finalMaxDamage);
-        }
-    }
-
-    public ItemList getBestItems(boolean canGetAligned, int maxTP) {
+    public AttackPlan getBestItems(boolean canGetAligned, int maxTP) {
         // TODO
         return null;
     }

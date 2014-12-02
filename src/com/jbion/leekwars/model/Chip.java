@@ -30,6 +30,7 @@ public class Chip extends Item {
         return true;
     }
 
+    @Override
     public int getCooldown() {
         return cooldown;
     }
