@@ -26,7 +26,7 @@ public class Chip extends Item {
     }
 
     @Override
-    public boolean isWeapon() {
+    public boolean isChip() {
         return true;
     }
 

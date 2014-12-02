@@ -36,7 +36,7 @@ public abstract class Item {
         return name;
     }
 
-    public int getTpCost() {
+    public int getTPCost() {
         return tpCost;
     }
 
@@ -74,5 +74,23 @@ public abstract class Item {
     
     public boolean isChip() {
         return false;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Item)) {
+            return false;
+        }
+        return ((Item) o).id == this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+    
+    @Override
+    public String toString() {
+        return name;
     }
 }
