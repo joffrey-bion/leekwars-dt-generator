@@ -3,9 +3,9 @@ package com.jbion.leekwars.algo;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jbion.leekwars.algo.data.DecisionTree;
 import com.jbion.leekwars.model.Chip;
 import com.jbion.leekwars.model.Weapon;
-import com.jbion.leekwars.utils.PrintUtils;
 
 public class Main {
     
@@ -23,7 +23,9 @@ public class Main {
         //chips.add(Chip.ICE);
         
         Optimizer opt = new Optimizer(weapons, chips);
-        opt.optimize(maxTP);
+        DecisionTree decisionTree = opt.optimize(maxTP);
+        
+        System.out.println(decisionTree);
     }
 
 }

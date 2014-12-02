@@ -1,5 +1,6 @@
 package com.jbion.leekwars.algo.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,8 +45,8 @@ public class TPMap {
         planSets.get(tp).add(plan);
     }
 
-    public void removePlansContainingItem(Item item) {
-        planSets.values().stream().forEach(ps -> ps.removePlansContainingItem(item));
+    public void limitPlansTo(Collection<Item> items) {
+        planSets.values().stream().forEach(ps -> ps.limitPlansTo(items));
     }
 
     public void normalize() {
@@ -91,14 +92,24 @@ public class TPMap {
         return plansSet.stream().findAny().orElse(AttackPlan.EMPTY);
     }
 
-    @Override
-    public String toString() {
+    public String asCode() {
+        // TODO
+        return toString();
+    }
+
+    public String toString(String prefix) {
         StringBuilder sb = new StringBuilder();
         for (int tp = 1; tp <= maxTP; tp++) {
+            sb.append(prefix);
             sb.append(String.format("%2s", tp)).append(" TP: ");
             sb.append(isNormalized() ? normalizedMap.get(tp) : planSets.get(tp));
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString("");
     }
 }

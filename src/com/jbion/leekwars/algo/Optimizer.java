@@ -1,14 +1,18 @@
 package com.jbion.leekwars.algo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.jbion.leekwars.algo.data.AttackPlan;
 import com.jbion.leekwars.algo.data.AttackPlansSet;
+import com.jbion.leekwars.algo.data.DecisionTree;
 import com.jbion.leekwars.algo.data.TPMap;
+import com.jbion.leekwars.algo.data.WeaponMap;
 import com.jbion.leekwars.model.Chip;
 import com.jbion.leekwars.model.Item;
 import com.jbion.leekwars.model.Weapon;
@@ -19,33 +23,29 @@ public class Optimizer {
     private List<Item> items;
     private Map<Integer, AttackPlansSet> allPlansSets;
 
-    private Map<Weapon, TPMap> plansSetsByTPByWeapon;
-
     public Optimizer(List<Weapon> weapons, List<Chip> chips) {
         this.weapons = weapons;
         this.items = new ArrayList<>();
         items.addAll(weapons);
         items.addAll(chips);
         allPlansSets = new HashMap<>();
-        plansSetsByTPByWeapon = new HashMap<>(weapons.size());
     }
 
-    public void optimize(int maxTP) {
-
+    public DecisionTree optimize(int maxTP) {
         initializePlansSets(maxTP);
-
         System.out.println(allPlansSets);
 
-        sortByWeaponEquipped(maxTP);
-
-        for (Weapon equippedWeapon : weapons) {
-            TPMap plansByTP = plansSetsByTPByWeapon.get(equippedWeapon);
-            System.out.println("\nFor Equipped Weapon " + equippedWeapon);
-            System.out.println(plansByTP);
-            plansByTP.normalize();
-            System.out.println("\n=> NORMALIZED");
-            System.out.println(plansByTP);
+        WeaponMap weaponMap = sortByWeaponEquipped(maxTP);
+        
+        DecisionTree decisionTree = new DecisionTree(items);
+        for (int code = 1; code < Math.pow(2, items.size()); code++) {
+            WeaponMap copy = new WeaponMap(weaponMap);
+            copy.limitPlansTo(decisionTree.getUsableItems(code));
+            copy.normalize();
+            decisionTree.put(code, copy);
         }
+        
+        return decisionTree;
     }
 
     /**
@@ -97,8 +97,8 @@ public class Optimizer {
         return plansSet;
     }
 
-    private void sortByWeaponEquipped(int maxTP) {
-        plansSetsByTPByWeapon.clear();
+    private WeaponMap sortByWeaponEquipped(int maxTP) {
+        WeaponMap weaponMap = new WeaponMap(weapons);
         for (Weapon equippedWeapon : weapons) {
             TPMap tpMap = new TPMap(maxTP);
             allPlansSets.values().stream().flatMap(Set::stream).forEach(plan -> {
@@ -107,12 +107,8 @@ public class Optimizer {
                     tpMap.addPlan(tp, plan);
                 }
             });
-            plansSetsByTPByWeapon.put(equippedWeapon, tpMap);
+            weaponMap.put(equippedWeapon, tpMap);
         }
-    }
-
-    public AttackPlan getBestItems(boolean canGetAligned, int maxTP) {
-        // TODO
-        return null;
+        return weaponMap;
     }
 }
