@@ -92,15 +92,21 @@ public class TPMap {
         return plansSet.stream().findAny().orElse(AttackPlan.EMPTY);
     }
 
-    public String asCode() {
-        // TODO
-        return toString();
-    }
-
-    public String toString(String prefix) {
+    public String asCode(String indent) {
         StringBuilder sb = new StringBuilder();
         for (int tp = 1; tp <= maxTP; tp++) {
-            sb.append(prefix);
+            sb.append(indent);
+            sb.append(String.format("%2s", tp)).append(" : ");
+            sb.append(isNormalized() ? normalizedMap.get(tp) : planSets.get(tp));
+            sb.append(",\n");
+        }
+        return sb.deleteCharAt(sb.lastIndexOf(",")).toString();
+    }
+
+    public String toString(String indent) {
+        StringBuilder sb = new StringBuilder();
+        for (int tp = 1; tp <= maxTP; tp++) {
+            sb.append(indent);
             sb.append(String.format("%2s", tp)).append(" TP: ");
             sb.append(isNormalized() ? normalizedMap.get(tp) : planSets.get(tp));
             sb.append("\n");

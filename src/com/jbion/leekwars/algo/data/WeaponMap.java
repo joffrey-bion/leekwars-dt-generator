@@ -34,8 +34,23 @@ public class WeaponMap extends HashMap<Weapon, TPMap> {
     }
 
     public String asCode() {
-        // TODO
-        return toString();
+        return asCode("");
+    }
+
+    public String asCode(String indent) {
+        StringBuilder sb = new StringBuilder();
+        for (Weapon weapon : weapons) {
+            sb.append(indent);
+            sb.append(weapon).append(" : [\n");
+            sb.append(get(weapon).asCode(indent + "\t"));
+            sb.append(indent).append("],\n");
+        }
+        return sb.deleteCharAt(sb.lastIndexOf(",")).toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString("");
     }
 
     public String toString(String prefix) {
@@ -47,10 +62,5 @@ public class WeaponMap extends HashMap<Weapon, TPMap> {
             sb.append(prefix).append("}\n");
         }
         return sb.toString();
-    }
-
-    @Override
-    public String toString() {
-        return toString("");
     }
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.jbion.leekwars.model.Item;
-import com.jbion.leekwars.model.Weapon;
 
 public class DecisionTree extends HashMap<Integer, WeaponMap>{
     
@@ -15,6 +14,10 @@ public class DecisionTree extends HashMap<Integer, WeaponMap>{
     
     public DecisionTree(List<Item> allItems) {
         allItemsSorted = allItems.stream().sorted(Comparator.comparingInt(Item::getId)).collect(Collectors.toList());
+    }
+    
+    public List<Item> getItems() {
+        return allItemsSorted;
     }
 
     public List<Item> getUsableItems(int code) {
@@ -29,10 +32,31 @@ public class DecisionTree extends HashMap<Integer, WeaponMap>{
         }
         return usable;
     }
+    
+    public int getCode(Item item) {
+        return (int) Math.pow(2, allItemsSorted.indexOf(item));
+    }
 
     public String asCode() {
-        // TODO
-        return toString();
+        return asCode("");
+    }
+
+    public String asCode(String indent) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(indent).append("[\n");
+        for (Integer code : keySet()) {
+            sb.append(indent).append("\t").append(code).append(" : [\n");
+            sb.append(get(code).asCode(indent + "\t\t"));
+            sb.append(indent).append("\t],\n");
+        }
+        sb.deleteCharAt(sb.lastIndexOf(","));
+        sb.append(indent).append("]");
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString("");
     }
 
     public String toString(String prefix) {
@@ -46,10 +70,4 @@ public class DecisionTree extends HashMap<Integer, WeaponMap>{
         }
         return sb.toString();
     }
-
-    @Override
-    public String toString() {
-        return toString("");
-    }
-
 }

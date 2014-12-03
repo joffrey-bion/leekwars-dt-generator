@@ -1,12 +1,10 @@
 package com.jbion.leekwars.algo;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.jbion.leekwars.algo.data.AttackPlan;
 import com.jbion.leekwars.algo.data.AttackPlansSet;
@@ -31,12 +29,9 @@ public class Optimizer {
         allPlansSets = new HashMap<>();
     }
 
-    public DecisionTree optimize(int maxTP) {
+    public DecisionTree buildDecisionTree(int maxTP) {
         initializePlansSets(maxTP);
-        System.out.println(allPlansSets);
-
         WeaponMap weaponMap = sortByWeaponEquipped(maxTP);
-        
         DecisionTree decisionTree = new DecisionTree(items);
         for (int code = 1; code < Math.pow(2, items.size()); code++) {
             WeaponMap copy = new WeaponMap(weaponMap);
@@ -44,7 +39,6 @@ public class Optimizer {
             copy.normalize();
             decisionTree.put(code, copy);
         }
-        
         return decisionTree;
     }
 
