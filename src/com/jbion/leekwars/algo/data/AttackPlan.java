@@ -15,7 +15,14 @@ import com.jbion.leekwars.model.Weapon;
 public class AttackPlan extends ArrayList<Item> {
 
     public static final AttackPlan EMPTY = new AttackPlan();
-    
+
+    public static Collector<Item, AttackPlan, AttackPlan> getCollector() {
+        return Collector.of(AttackPlan::new, AttackPlan::add, (list1, list2) -> {
+            list1.addAll(list2);
+            return list1;
+        });
+    }
+
     @Override
     public boolean add(Item item) {
         if (item.getCooldown() > 0 && contains(item)) {
@@ -66,11 +73,12 @@ public class AttackPlan extends ArrayList<Item> {
         return (int) stream().filter(i -> i.equals(item)).count();
     }
 
-    public static Collector<Item, AttackPlan, AttackPlan> getCollector() {
-        return Collector.of(AttackPlan::new, AttackPlan::add, (list1, list2) -> {
-            list1.addAll(list2);
-            return list1;
-        });
+    public void reorderWeaponFirst(Weapon weapon) {
+        int count = getCount(weapon);
+        while (remove(weapon));
+        for (int i = 0; i < count; i++) {
+            add(0, weapon);
+        }
     }
 
     @Override

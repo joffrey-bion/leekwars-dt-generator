@@ -101,6 +101,7 @@ public class Optimizer {
                     tpMap.addPlan(tp, plan);
                 }
             });
+            tpMap.reorderWeaponFirst(equippedWeapon);
             weaponMap.put(equippedWeapon, tpMap);
         }
         return weaponMap;

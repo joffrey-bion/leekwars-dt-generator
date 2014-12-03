@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.jbion.leekwars.model.Item;
+import com.jbion.leekwars.model.Weapon;
 
 /**
  * A map between TP amounts and attack plans.
@@ -16,8 +17,6 @@ import com.jbion.leekwars.model.Item;
  * {@link #getPlan(int)} may be called.
  */
 public class TPMap {
-
-
 
     private final int maxTP;
     private final HashMap<Integer, AttackPlansSet> planSets;
@@ -90,6 +89,13 @@ public class TPMap {
         }
         AttackPlansSet plansSet = planSets.get(tp);
         return plansSet.stream().findAny().orElse(AttackPlan.EMPTY);
+    }
+
+    public void reorderWeaponFirst(Weapon weapon) {
+        for (AttackPlansSet set : planSets.values()) {
+            set.stream().forEach(p -> p.reorderWeaponFirst(weapon));
+        }
+        normalizedMap.values().stream().forEach(p -> p.reorderWeaponFirst(weapon));
     }
 
     public String asCode(String indent) {
