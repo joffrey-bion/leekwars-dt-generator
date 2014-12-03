@@ -24,6 +24,52 @@ public class AttackPlanTest {
     }
 
     @Test
+    public void testReorder1() {
+        AttackPlan plan = new AttackPlan();
+        plan.add(Weapon.DOUBLE_GUN);
+        plan.add(Chip.SPARK);
+        plan.add(Weapon.DOUBLE_GUN);
+        plan.add(Weapon.DOUBLE_GUN);
+        plan.add(Chip.SPARK);
+        plan.add(Chip.ICE);
+        AttackPlan plan2 = new AttackPlan();
+        plan2.add(Weapon.DOUBLE_GUN);
+        plan2.add(Weapon.DOUBLE_GUN);
+        plan2.add(Weapon.DOUBLE_GUN);
+        plan2.add(Chip.SPARK);
+        plan2.add(Chip.SPARK);
+        plan2.add(Chip.ICE);
+        plan.reorderWeaponFirst(Weapon.DOUBLE_GUN);
+        for (int i = 0; i < plan.size(); i++) {
+            assertEquals(plan2.get(i), plan.get(i));
+        }
+    }
+
+    @Test
+    public void testReorder2() {
+        AttackPlan plan = new AttackPlan();
+        plan.add(Chip.SPARK);
+        plan.add(Weapon.DOUBLE_GUN);
+        plan.add(Chip.SPARK);
+        plan.add(Chip.ICE);
+        plan.add(Weapon.DOUBLE_GUN);
+        plan.add(Weapon.DOUBLE_GUN);
+        System.out.println("plan = " + plan);
+        AttackPlan plan2 = new AttackPlan();
+        plan2.add(Weapon.DOUBLE_GUN);
+        plan2.add(Weapon.DOUBLE_GUN);
+        plan2.add(Weapon.DOUBLE_GUN);
+        plan2.add(Chip.SPARK);
+        plan2.add(Chip.SPARK);
+        plan2.add(Chip.ICE);
+        plan.reorderWeaponFirst(Weapon.DOUBLE_GUN);
+        System.out.println("r.plan = " + plan);
+        for (int i = 0; i < plan.size(); i++) {
+            assertEquals(plan2.get(i), plan.get(i));
+        }
+    }
+
+    @Test
     public void testEquals() {
         AttackPlan plan = new AttackPlan();
         plan.add(Weapon.DOUBLE_GUN);

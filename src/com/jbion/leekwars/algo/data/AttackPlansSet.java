@@ -12,7 +12,7 @@ public class AttackPlansSet extends HashSet<AttackPlan> {
     public AttackPlansSet() {}
 
     public AttackPlansSet(AttackPlansSet source) {
-        super(source);
+        source.stream().forEach(p -> add(new AttackPlan(p)));        
     }
 
     public void limitPlansTo(Collection<Item> items) {

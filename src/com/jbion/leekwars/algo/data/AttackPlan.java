@@ -16,6 +16,12 @@ public class AttackPlan extends ArrayList<Item> {
 
     public static final AttackPlan EMPTY = new AttackPlan();
 
+    public AttackPlan() {}
+
+    public AttackPlan(AttackPlan p) {
+        super(p);
+    }
+
     public static Collector<Item, AttackPlan, AttackPlan> getCollector() {
         return Collector.of(AttackPlan::new, AttackPlan::add, (list1, list2) -> {
             list1.addAll(list2);
@@ -75,7 +81,8 @@ public class AttackPlan extends ArrayList<Item> {
 
     public void reorderWeaponFirst(Weapon weapon) {
         int count = getCount(weapon);
-        while (remove(weapon));
+        while (remove(weapon))
+            ;
         for (int i = 0; i < count; i++) {
             add(0, weapon);
         }

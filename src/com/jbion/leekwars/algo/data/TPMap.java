@@ -11,7 +11,8 @@ import com.jbion.leekwars.model.Weapon;
  * A map between TP amounts and attack plans.
  * <p>
  * During the creation phase (before normalization), a TP amount may be associated to 0, 1, or more
- * plans, thus {@link #getPlan(int)} may not be called (it would throw an {@link IllegalStateException}).
+ * plans, thus {@link #getPlan(int)} may not be called (it would throw an
+ * {@link IllegalStateException}).
  * <p>
  * After calling {@link #normalize()}, each TP amount is associated with exatcly one plan, thus
  * {@link #getPlan(int)} may be called.
@@ -34,10 +35,13 @@ public class TPMap {
     public TPMap(TPMap source) {
         this.maxTP = source.maxTP;
         this.planSets = new HashMap<>(maxTP);
+        this.normalizedMap = new HashMap<>();
         for (int tp = 1; tp <= maxTP; tp++) {
             planSets.put(tp, new AttackPlansSet(source.planSets.get(tp)));
+            if (source.isNormalized()) {
+                normalizedMap.put(tp, new AttackPlan(source.normalizedMap.get(tp)));
+            }
         }
-        this.normalizedMap = new HashMap<>(source.normalizedMap);
     }
 
     public void addPlan(int tp, AttackPlan plan) {
@@ -67,11 +71,11 @@ public class TPMap {
             normalizedMap.put(tp, plansSet.stream().findAny().orElse(currentMaxDamagePlan));
         }
     }
-    
+
     public boolean isNormalized() {
         return normalizedMap.size() > 0;
     }
-    
+
     public Map<Integer, AttackPlan> getNormalizedMap() {
         if (!isNormalized()) {
             throw new IllegalStateException("The TP Map should be normalized before calling getNormalizedMap()");

@@ -98,7 +98,7 @@ public class Optimizer {
             allPlansSets.values().stream().flatMap(Set::stream).forEach(plan -> {
                 int tp = plan.getTpCost(equippedWeapon);
                 if (tp <= maxTP) {
-                    tpMap.addPlan(tp, plan);
+                    tpMap.addPlan(tp, new AttackPlan(plan));
                 }
             });
             tpMap.reorderWeaponFirst(equippedWeapon);
