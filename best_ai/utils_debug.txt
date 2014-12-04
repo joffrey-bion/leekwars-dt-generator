@@ -1,0 +1,49 @@
+function debugResult(prefix, result) {
+	if (result == null || result == USE_SUCCESS || result == USE_FAILED) {
+		debug(prefix + getResultName(result));
+	} else {
+		debugE(prefix + getResultName(result));
+	}
+}
+
+function itemsToString(items) {
+	return arrayMap(items, getItemName);
+}
+
+function getResultName(result) {
+	if (result == null) {
+		return "null";
+	} else if (result == USE_SUCCESS) {
+		return "success";
+	} else if (result == USE_FAILED) {
+		return "failed";
+	} else if (result == USE_INVALID_POSITION) {
+		return "invalid position";
+	} else if (result == USE_INVALID_COOLDOWN) {
+		return "invalid cooldown";
+	} else if (result == USE_INVALID_TARGET) {
+		return "invalid target";
+	} else if (result == USE_NOT_ENOUGH_TP) {
+		return "not enough TP";
+	} else {
+		return "unknown result code " + result;
+	}
+}
+
+function getItemName(item) {
+	if (isChip(item)) {
+		return getChipName(item);
+	} else if (isWeapon(item)) {
+		return getWeaponName(item);
+	} else {
+		return item;
+	}
+}
+
+function arrayMap(tableau, mapFunction) {
+    var r = [];
+    for (var e in tableau) {
+		push(r, mapFunction(e));
+	}
+    return r;
+}

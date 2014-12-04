@@ -1,0 +1,100 @@
+global CELL_CENTER = 306;
+
+global CELL_TOP_LEFT = 0;
+global CELL_TOP_RIGHT = 17;
+global CELL_BOTTOM_LEFT = 595;
+global CELL_BOTTOM_RIGHT = 612;
+
+function isInCorner() {
+	var c = getCell();
+	return c == CELL_TOP_LEFT || c == CELL_TOP_RIGHT || c == CELL_BOTTOM_LEFT || c == CELL_BOTTOM_RIGHT;
+}
+
+function getOppositeCorner(cell) {
+	if (cell == CELL_TOP_LEFT) {
+		return CELL_BOTTOM_RIGHT;
+	} else if (cell == CELL_TOP_RIGHT) {
+		return CELL_BOTTOM_LEFT;
+	} else if (cell == CELL_BOTTOM_LEFT) {
+		return CELL_TOP_RIGHT;
+	} else if (cell == CELL_BOTTOM_RIGHT) {
+		return CELL_TOP_LEFT;
+	} else {
+		debugE("[getOppositeCorner] the input is not a corner!");
+		return null;
+	}
+}
+
+function getMinDistanceToCells(cell, area) {
+	var minDistance = 500;
+	for (var c in area) {
+		minDistance = min(minDistance, getPathLength(cell, c));
+	}
+	return minDistance;
+}
+
+function getClosestCell(cell, area) {
+	var minDistance = getMinDistanceToCells(cell, area);
+	for (var c in area) {
+		if (minDistance == getPathLength(cell, c)) {
+			return c;
+		}
+	}
+	if (isEmpty(area)) {
+		debug("[getClosestCell] empty area, no closest cell");
+	} else {
+		debugE("[getClosestCell] something went wrong: minDistance not found in second loop");
+	}
+	return null;
+}
+
+function union(arrayOfAreas) {
+	var unionArea = [];
+	for (var area in arrayOfAreas) {
+		for (var cell in area) {
+			if (!inArray(unionArea, cell)) {
+				push(unionArea, cell);
+			}
+		}
+	}
+	return unionArea;
+}
+
+function intersection(arrayOfAreas) {
+	if (isEmpty(arrayOfAreas)) {
+		return [];
+	}
+	var intersectionArea = arrayOfAreas[0];
+	for (var cell in intersectionArea) {
+		for (var area in arrayOfAreas) {
+			if (!inArray(area, cell)) {
+				removeElement(intersectionArea, cell);
+			}
+		}
+	}
+	return intersectionArea;
+}
+
+function distanceToUseWeapon(weapon, enemy, cell) {
+	var area = getCellsToUseWeapon(weapon, enemy);
+	return getMinDistanceToCells(cell, area);
+}
+
+function distanceToUseChip(chip, enemy, cell) {
+	var area = getCellsToUseChip(chip, enemy);
+	return getMinDistanceToCells(cell, area);
+}
+
+function getCellsToUseItems(items, leek) {
+	var inRangeAreas = [];
+	for (var item in items) {
+		var area;
+		if (isChip(item)) {
+			area = getCellsToUseChip(item, leek);
+		} else {
+			area = getCellsToUseWeapon(item, leek);
+		}
+		push(inRangeAreas, area);
+	}
+	return intersection(inRangeAreas);
+}

@@ -1,0 +1,31 @@
+// ====================
+// Weapons: pistol
+// Chips: none
+// ====================
+
+function attack(enemy) {
+	var result;
+	do {
+		result = useWeapon(enemy);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+// ====================
+// Main program
+// ====================
+
+if (getWeapon() == null) {
+	setWeapon(WEAPON_PISTOL);
+}
+
+var enemy = getNearestEnemy();
+
+var result = attack(enemy);
+while (result == USE_INVALID_POSITION && getMP() > 0) {
+	var mp = moveToward(enemy, 1);
+	if (mp == 0) {
+		break; // stuck somewhere, avoid infinite loop
+	}
+	result = attack(enemy);
+}

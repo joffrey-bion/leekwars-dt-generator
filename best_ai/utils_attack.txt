@@ -1,0 +1,92 @@
+include("utils_debug");
+include("utils_board");
+include("gen_best_attack");
+
+function getLifePercent() {
+	return getLife() * 100 / getTotalLife();
+}
+
+function getEnemyWithLowestLife() {
+	var enemies = getAliveEnemies();
+	var minLife = 100000;
+	for (var id in enemies) {
+		minLife = min(getLife(id), minLife);
+	}
+	for (var id in enemies) {
+		if (minLife == getLife(id)) {
+			return id;
+		}
+	}
+	debugE("[getEnemyWithLowestLife] IMPOSSIBRU! lowest life not found in second loop");
+	return null;
+}
+
+function loopWeapon(enemy) {
+	var result;
+	do {
+		result = useWeapon(enemy);
+		debugResult("[Weapon] ", result);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+function loopChip(chip, target) {
+	var result;
+	do {
+		result = useChip(chip, target);
+		debugResult("[Chip] ", result);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+function loopWeaponOrChip(enemy, chip) {
+	var result = loopWeapon(enemy);
+	if (result == USE_INVALID_POSITION) {
+		debug("Out of range, using chip");
+		result = loopChip(chip, enemy);
+	}
+	return result;
+}
+
+function attackOptimal(maxTP, allowedItems, enemy, onlyIfInRange) {
+	debug("[attackOptimal] TP=" + maxTP + " items=" + itemsToString(allowedItems) + " onlyIfInRange=" + onlyIfInRange);
+	var plan = getAttackPlan(maxTP, allowedItems);
+	if (getInRange(plan, enemy, onlyIfInRange)) {
+		debug("[attackOptimal] in range, start attacking!");
+		performPlan(plan, enemy);
+	}
+}
+
+// assumes there is a cell that allows to use all weapons
+function getInRange(plan, enemy, onlyTest) {
+	var inRangeArea = getCellsToUseItems(plan, enemy);
+	if (!inArray(inRangeArea, getCell())) {
+		if (!onlyTest) {
+			debug("[getInRange] out of range, getting closer");
+			moveTowardCell(getClosestCell(getCell(), inRangeArea));
+			return true;
+		}
+		debug("[getInRange] out of range, but not moving (test only)");
+		return false;
+	} else {
+		debug("[getInRange] already in range");
+		return true;
+	}
+}
+
+function performPlan(plan, enemy) {
+	var results = [];
+	debug("[performPlan] plan=" + itemsToString(plan));
+	for (var item in plan) {
+		if (isChip(item)) {
+			push(results, useChip(item, enemy));
+		} else {
+			if (getWeapon() != item) {
+				debug("[performPlan] changing weapon " + getItemName(getWeapon()) + " to " + getItemName(item));
+				setWeapon(item);
+			}
+			push(results, useWeapon(enemy));
+		}
+	}
+	debug("[performPlan] results=" + arrayMap(results, getResultName));
+}

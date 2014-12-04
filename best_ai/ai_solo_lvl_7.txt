@@ -1,0 +1,52 @@
+// ====================
+// Weapons: pistol
+// Chips: spark
+// ====================
+
+function loopWeapon(enemy) {
+	var result;
+	do {
+		result = useWeapon(enemy);
+		debugResult("[Weapon] ", result);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+function loopChip(chip, target) {
+	var result;
+	do {
+		result = useChip(chip, target);
+		debugResult("[Chip] ", result);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+function attack(enemy, chip) {
+	var result = loopWeapon(enemy);
+	if (result == USE_INVALID_POSITION) {
+		debug("Out of range, using chip");
+		result = loopChip(chip, enemy);
+	}
+	return result;
+}
+
+// ====================
+// Main program
+// ====================
+
+if (getWeapon() == null) {
+	setWeapon(WEAPON_PISTOL);
+}
+
+var enemy = getNearestEnemy();
+
+var result = attack(enemy, CHIP_SPARK);
+while (result == USE_INVALID_POSITION && getMP() > 0) {
+	var mp = moveToward(enemy, 1);
+	if (mp == 0) {
+		break; // stuck somewhere, avoid infinite loop
+	}
+	result = attack(enemy, CHIP_SPARK);
+}
+
+moveAwayFrom(enemy);
