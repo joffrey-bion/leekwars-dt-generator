@@ -53,6 +53,7 @@ public class Main {
         System.out.println("\tfor (var i = 0; i < " + max + "; i++) {");
         System.out.println("\t\tpush(itemSets, codeToItems(i));");
         System.out.println("\t}");
+        System.out.println("\treverse(itemSets);");
         System.out.println("\treturn itemSets;\n}");
     }
 
