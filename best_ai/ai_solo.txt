@@ -1,0 +1,174 @@
+include("utils_debug");
+include("utils_attack");
+include("utils_board");
+include("gen_best_attack");
+
+// ====================
+// Settings
+// ====================
+// heal thresholds
+global LIFE_THRESHOLD_FOR_BANDAGE = getTotalLife() - 15;
+global LIFE_THRESHOLD_FOR_CURE = getTotalLife() - 43;
+global LIFE_THRESHOLD_EMERGENCY_HEAL = 60;
+// attack thresholds
+global LIFE_THRESHOLD_FOR_GAP_CLOSING = 130;
+global ENEMY_LIFE_THRESHOLD_TO_GO_CRAZY = 60;
+global TURN_THRESHOLD_END_GAME = MAX_TURNS / 2;
+
+// ====================
+// Functions
+// ====================
+function shouldStayAwayFrom(enemy) {
+	return getLife() < LIFE_THRESHOLD_FOR_GAP_CLOSING && getLife() < getLife(enemy);
+}
+
+function shouldHeal(enemy) {
+	return getLife() < max(LIFE_THRESHOLD_FOR_GAP_CLOSING, getLife(enemy) * 1.5);
+}
+
+function shouldGoFullDamage(enemy) {
+	return getLife(enemy) < ENEMY_LIFE_THRESHOLD_TO_GO_CRAZY && getLife() > getLife(enemy) * 2.5;
+}
+
+function getEnemyRange(enemy) {
+	var enemyWeaponRange = getWeaponMaxScope(getWeapon(enemy));
+	//var chips = getChips(enemy)
+	// we can't get the enemy's chips yet, let's assume he's got spark
+	var enemyChipsRange = getChipMaxScope(CHIP_SPARK);
+	return max(enemyWeaponRange, enemyChipsRange);
+}
+
+function attackableBy(enemy) {
+	return getDistance(getCell(), getCell(enemy)) < getEnemyRange(enemy) + getMP(enemy);
+}
+
+function healIfNeeded(enemy) {
+	var result;
+	if (getLife() < LIFE_THRESHOLD_EMERGENCY_HEAL && canUseChip(CHIP_CURE, getLeek())) {
+		debug("[healIfNeeded] Emergency heal threshold reached");
+		result = useChip(CHIP_WARM_UP, getLeek());
+		debugResult("[healIfNeeded] WARMUP: ", result);
+		result = useChip(CHIP_CURE, getLeek());
+		debugResult("[healIfNeeded] CURE: ", result);
+	} else if (shouldHeal(enemy) && getLife() < LIFE_THRESHOLD_FOR_CURE) {
+		debug("[healIfNeeded] Heavy heal threshold reached");
+		result = useChip(CHIP_CURE, getLeek());
+		debugResult("[healIfNeeded] CURE: ", result);
+	}
+	if (shouldHeal(enemy) && getLife() < LIFE_THRESHOLD_FOR_BANDAGE && result != USE_SUCCESS) {
+		debug("[healIfNeeded] Small heal threshold reached");
+		result = useChip(CHIP_BANDAGE, getLeek());
+		debugResult("[healIfNeeded] BANDAGE: ", result);
+	}
+	return result;
+}
+
+function useChipOnTurns(chip, leek, turns) {
+	var curr = getTurn() % 12;
+	for (var t in turns) {
+		if (curr == t) {
+			return useChip(chip, leek);
+		}
+	}
+	debug("[useChipOnTurns] nothing to use now");
+	return null;
+}
+
+function computeUsableOffensiveItems(itemSets, enemy) {
+	for (var set in itemSets) {
+		var area = getCellsToUseItems(set, enemy);
+		// TODO use something smarter including AoE self damage prediction
+		if (inArray(area, getCell())) {
+			debug("[computeUsableItems] in range for all items in the set " + itemsToString(set));
+			return set;
+		}
+		//if (getMinDistanceToCells(getCell(), area) < getMP()) {
+		//debug("[computeUsableItems] can get in range for all items in the set " + set);
+		//return set;
+		//}
+	}
+	debug("[computeUsableItems] no item is usable for now");
+	return [];
+}
+
+function attack(enemy) {
+	var minItemsToStop = getTurn() > TURN_THRESHOLD_END_GAME ? 2 : 1;
+	var itemSets = getAllItemCombinations();
+	var usableOffensiveItems = computeUsableOffensiveItems(itemSets, enemy);
+	if (!shouldStayAwayFrom(enemy)) {
+		while (count(usableOffensiveItems) < minItemsToStop && getMP() > 0) {
+			debug("[Attack] Moving in!");
+			var mp = moveToward(enemy, 1);
+			if (mp == 0) {
+				debug("[Attack] I'm stuck, I give up.");
+				break;
+			}
+			usableOffensiveItems = computeUsableOffensiveItems(itemSets, enemy);
+		}
+	} else {
+		debug("[Attack] I'm not feeling good, better stay away for now.");
+	}
+	if (!isEmpty(usableOffensiveItems)) {
+		debug("[Attack] Starting DPS!");
+		attackOptimal(getTP(), usableOffensiveItems, enemy, shouldStayAwayFrom(enemy));
+	} else {
+		debug("[Attack] No attack can be used at the moment");
+	}
+}
+
+function getAwayFrom(enemy) {
+	if (getMP() > 0) {
+		if (isInCorner()) {
+			debug("[getAwayFrom] Let's get out of that corner'!");
+			moveTowardCell(CELL_CENTER);
+		} else {
+			debug("[getAwayFrom] I'm outta here, bitch!");
+			if (moveAwayFrom(enemy) == 0) {
+				debug("[getAwayFrom] Looks like I didn't move... let's get out the other way!");
+				moveTowardCell(CELL_CENTER);
+			}
+		}
+	} else {
+		debug("[getAwayFrom] I can't move anymore. There's no getting away.");
+	}
+}
+
+// ====================
+// Main program
+// ====================
+
+// Init
+if (getWeapon() == null) {
+	debug("First turn, equip weapon");
+	setWeapon(WEAPON_DOUBLE_GUN);
+}
+var result = null;
+var enemy = getNearestEnemy();
+
+if (!shouldGoFullDamage(enemy)) {
+	// Heal
+	result = healIfNeeded(enemy);
+
+	// Protect and boost
+	if (!shouldStayAwayFrom(enemy) || attackableBy(enemy)) {
+		// TODO use something smarter
+		result = useChipOnTurns(CHIP_HELMET, getLeek(), [1]);
+		debugResult("[Helmet] ", result);
+		if (canUseChip(CHIP_STEROID, getLeek())) {
+			result = useChipOnTurns(CHIP_STEROID, getLeek(), [3]);
+			debugResult("[Steroid] ", result);
+		} else {
+			result = useChipOnTurns(CHIP_PROTEIN, getLeek(), [0, 3]);
+			debugResult("[Protein] ", result);
+		}
+	}
+}
+
+// Attack
+attack(enemy);
+
+// Consume TPs with healing
+healIfNeeded(enemy);
+
+// Consume MPs to get away
+getAwayFrom(enemy);
