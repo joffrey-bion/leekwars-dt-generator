@@ -15,12 +15,14 @@ function attack(enemy) {
 // Main program
 // ====================
 
+var enemy = getNearestEnemy();
+
+// equip weapon (only if needed)
 if (getWeapon() == null) {
 	setWeapon(WEAPON_PISTOL);
 }
 
-var enemy = getNearestEnemy();
-
+// attack
 var result = attack(enemy);
 while (result == USE_INVALID_POSITION && getMP() > 0) {
 	var mp = moveToward(enemy, 1);
