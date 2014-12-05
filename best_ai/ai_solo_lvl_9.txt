@@ -48,13 +48,13 @@ if (getDistance(getCell(), getCell(enemy)) == 1) {
 }
 
 // attack
-var result = loopWeaponOrChip(enemy, CHIP_SPARK);
+var result = attack(enemy, CHIP_SPARK);
 while (result == USE_INVALID_POSITION && getMP() > 0) {
 	var mp = moveToward(enemy, 1);
 	if (mp == 0) {
 		break; // stuck somewhere, avoid infinite loop
 	}
-	result = loopWeaponOrChip(enemy, CHIP_SPARK);
+	result = attack(enemy, CHIP_SPARK);
 }
 
 // get away
