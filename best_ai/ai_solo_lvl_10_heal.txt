@@ -1,0 +1,71 @@
+// ====================
+// Weapons: pistol, double gun
+// Chips: spark, bandage
+// ====================
+
+function loopWeapon(enemy) {
+	var result;
+	do {
+		result = useWeapon(enemy);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+function loopChip(chip, target) {
+	var result;
+	do {
+		result = useChip(chip, target);
+	} while (result == USE_SUCCESS || result == USE_FAILED);
+	return result;
+}
+
+function attack(enemy, chip) {
+	var result = loopWeapon(enemy);
+	if (result == USE_INVALID_POSITION) {
+		debug("Out of range, using chip");
+		result = loopChip(chip, enemy);
+	}
+	return result;
+}
+
+// ====================
+// Main program
+// ====================
+
+var enemy = getNearestEnemy();
+
+// heal if needed
+if (getLife() < getTotalLife() / 2 && getLife() < getLife(enemy) * 1.6) {
+	useChip(CHIP_BANDAGE, getLeek());
+}
+
+// choose weapon
+if (getDistance(getCell(), getCell(enemy)) == 1) {
+	// cannot use double gun at range 1
+	if (getWeapon() != WEAPON_PISTOL) {
+		setWeapon(WEAPON_PISTOL);
+	}
+} else {
+	// switch back to double gun if far enough
+	if (getWeapon() != WEAPON_DOUBLE_GUN) {
+		setWeapon(WEAPON_DOUBLE_GUN);
+	}
+}
+
+// attack
+var result = attack(enemy, CHIP_SPARK);
+while (result == USE_INVALID_POSITION && getMP() > 0) {
+	var mp = moveToward(enemy, 1);
+	if (mp == 0) {
+		break; // stuck somewhere, avoid infinite loop
+	}
+	result = attack(enemy, CHIP_SPARK);
+}
+
+// spend remaining TPs in heal
+if (getLife() < getTotalLife() && getTP() >= 2) {
+	useChip(CHIP_BANDAGE, getLeek());
+}
+
+// get away
+moveAwayFrom(enemy);
