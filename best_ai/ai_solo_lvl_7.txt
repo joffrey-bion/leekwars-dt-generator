@@ -7,7 +7,6 @@ function loopWeapon(enemy) {
 	var result;
 	do {
 		result = useWeapon(enemy);
-		debugResult("[Weapon] ", result);
 	} while (result == USE_SUCCESS || result == USE_FAILED);
 	return result;
 }
@@ -16,7 +15,6 @@ function loopChip(chip, target) {
 	var result;
 	do {
 		result = useChip(chip, target);
-		debugResult("[Chip] ", result);
 	} while (result == USE_SUCCESS || result == USE_FAILED);
 	return result;
 }
