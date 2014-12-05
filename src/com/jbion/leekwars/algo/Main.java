@@ -15,13 +15,12 @@ public class Main {
         int maxTP = 13;
 
         List<Weapon> weapons = new ArrayList<>();
-        weapons.add(Weapon.DOUBLE_GUN);
+        weapons.add(Weapon.MAGNUM);
         weapons.add(Weapon.LASER);
-        weapons.add(Weapon.SHOTGUN);
+        weapons.add(Weapon.GRENADE_LAUNCHER);
 
         List<Chip> chips = new ArrayList<>();
         chips.add(Chip.SPARK);
-        //chips.add(Chip.ICE);
 
         Optimizer opt = new Optimizer(weapons, chips);
         DecisionTree decisionTree = opt.buildDecisionTree(maxTP);
