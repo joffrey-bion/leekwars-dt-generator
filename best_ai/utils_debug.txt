@@ -41,9 +41,21 @@ function getItemName(item) {
 }
 
 function arrayMap(tableau, mapFunction) {
-    var r = [];
-    for (var e in tableau) {
+	var r = [];
+	for (var e in tableau) {
 		push(r, mapFunction(e));
 	}
-    return r;
+	return r;
+}
+
+function toBinaryString(integer) {
+	if (integer == 0) {
+		return "0";
+	}
+	var result = "";
+	while (integer > 0) {
+		result = integer % 2 + result;
+		integer = integer / 2 >> 0;
+	}
+	return result;
 }

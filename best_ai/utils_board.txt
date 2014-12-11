@@ -26,7 +26,7 @@ function getOppositeCorner(cell) {
 }
 
 function getMinDistanceToCells(cell, area) {
-	var minDistance = 500;
+	var minDistance = 1000;
 	for (var c in area) {
 		minDistance = min(minDistance, getPathLength(cell, c));
 	}
@@ -69,24 +69,16 @@ function intersection(arrayOfAreas) {
 		for (var area in arrayOfAreas) {
 			if (!inArray(area, cell)) {
 				removeElement(intersectionArea, cell);
+				break;
 			}
 		}
 	}
 	return intersectionArea;
 }
 
-function distanceToUseWeapon(weapon, enemy, cell) {
-	var area = getCellsToUseWeapon(weapon, enemy);
-	return getMinDistanceToCells(cell, area);
-}
-
-function distanceToUseChip(chip, enemy, cell) {
-	var area = getCellsToUseChip(chip, enemy);
-	return getMinDistanceToCells(cell, area);
-}
-
 function getCellsToUseItems(items, leek) {
 	var inRangeAreas = [];
+	// get in-range area for each item
 	for (var item in items) {
 		var area;
 		if (isChip(item)) {

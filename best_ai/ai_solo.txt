@@ -31,10 +31,8 @@ function shouldGoFullDamage(enemy) {
 }
 
 function getEnemyRange(enemy) {
-	var enemyWeaponRange = getWeaponMaxScope(getWeapon(enemy));
-	//var chips = getChips(enemy)
-	// we can't get the enemy's chips yet, let's assume he's got spark
-	var enemyChipsRange = getChipMaxScope(CHIP_SPARK);
+	var enemyWeaponRange = arrayMax(arrayMap(getWeapons(enemy), getWeaponMaxScope));
+	var enemyChipsRange = arrayMax(arrayMap(getChips(enemy), getChipMaxScope));
 	return max(enemyWeaponRange, enemyChipsRange);
 }
 
@@ -74,45 +72,22 @@ function useChipOnTurns(chip, leek, turns) {
 	return null;
 }
 
-function computeUsableOffensiveItems(itemSets, enemy) {
-	for (var set in itemSets) {
-		var area = getCellsToUseItems(set, enemy);
-		// TODO use something smarter including AoE self damage prediction
-		if (inArray(area, getCell())) {
-			debug("[computeUsableItems] in range for all items in the set " + itemsToString(set));
-			return set;
-		}
-		//if (getMinDistanceToCells(getCell(), area) < getMP()) {
-		//debug("[computeUsableItems] can get in range for all items in the set " + set);
-		//return set;
-		//}
-	}
-	debug("[computeUsableItems] no item is usable for now");
-	return [];
-}
-
 function attack(enemy) {
 	var minItemsToStop = getTurn() > TURN_THRESHOLD_END_GAME ? 2 : 1;
 	var itemSets = getAllItemCombinations();
 	var usableOffensiveItems = computeUsableOffensiveItems(itemSets, enemy);
-	if (!shouldStayAwayFrom(enemy)) {
-		while (count(usableOffensiveItems) < minItemsToStop && getMP() > 0) {
-			debug("[Attack] Moving in!");
-			var mp = moveToward(enemy, 1);
-			if (mp == 0) {
-				debug("[Attack] I'm stuck, I give up.");
-				break;
-			}
-			usableOffensiveItems = computeUsableOffensiveItems(itemSets, enemy);
+
+	if (isEmpty(usableOffensiveItems)) {
+		debug("[Attack] No attack can be used at the moment.");
+		if (!shouldStayAwayFrom(enemy)) {
+			debug("[Attack] Let's get in range!");
+			moveToward(enemy);
+		} else {
+			debug("[Attack] I won't go in right now, I'm not crazy.");
 		}
 	} else {
-		debug("[Attack] I'm not feeling good, better stay away for now.");
-	}
-	if (!isEmpty(usableOffensiveItems)) {
 		debug("[Attack] Starting DPS!");
 		attackOptimal(getTP(), usableOffensiveItems, enemy, shouldStayAwayFrom(enemy));
-	} else {
-		debug("[Attack] No attack can be used at the moment");
 	}
 }
 
@@ -140,7 +115,7 @@ function getAwayFrom(enemy) {
 // Init
 if (getWeapon() == null) {
 	debug("First turn, equip weapon");
-	setWeapon(WEAPON_DOUBLE_GUN);
+	setWeapon(WEAPON_MAGNUM);
 }
 var result = null;
 var enemy = getNearestEnemy();

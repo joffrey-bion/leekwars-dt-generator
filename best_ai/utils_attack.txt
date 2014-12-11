@@ -21,6 +21,17 @@ function getEnemyWithLowestLife() {
 	return null;
 }
 
+function loopItem(item, enemy) {
+	if (isWeapon(item)) {
+		if (getWeapon() != item) {
+			setWeapon(item);
+		}
+		loopWeapon(enemy);
+	} else {
+		loopChip(item, enemy);
+	}
+}
+
 function loopWeapon(enemy) {
 	var result;
 	do {
@@ -48,45 +59,65 @@ function loopWeaponOrChip(enemy, chip) {
 	return result;
 }
 
+function computeUsableOffensiveItems(itemSets, enemy) {
+	for (var set in itemSets) {
+		var area = getCellsToUseItems(set, enemy);
+		mark(area);
+		// TODO use something smarter including AoE self damage prediction
+		if (inArray(area, getCell())) {
+			debug("[computeUsableItems] in range for all items in the set " + itemsToString(set));
+			mark(area, COLOR_BLUE);
+			mark([getCell()], COLOR_GREEN);
+			return set;
+		} else if (getMinDistanceToCells(getCell(), area) <= getMP()) {
+			mark(area, COLOR_RED);
+			mark(getClosestCell(getCell(), area), COLOR_GREEN);
+			debug("[computeUsableItems] can get in range for all items in the set " + itemsToString(set));
+			return set;
+		}
+	}
+	debug("[computeUsableItems] Sorry boy, no item is usable for now");
+	return [];
+}
+
 function attackOptimal(maxTP, allowedItems, enemy, onlyIfInRange) {
 	debug("[attackOptimal] TP=" + maxTP + " items=" + itemsToString(allowedItems) + " onlyIfInRange=" + onlyIfInRange);
 	var plan = getAttackPlan(maxTP, allowedItems);
 	if (getInRange(plan, enemy, onlyIfInRange)) {
 		debug("[attackOptimal] in range, start attacking!");
-		performPlan(plan, enemy);
+		executePlan(plan, enemy);
 	}
 }
 
 // assumes there is a cell that allows to use all weapons
 function getInRange(plan, enemy, onlyTest) {
 	var inRangeArea = getCellsToUseItems(plan, enemy);
-	if (!inArray(inRangeArea, getCell())) {
-		if (!onlyTest) {
-			debug("[getInRange] out of range, getting closer");
-			moveTowardCell(getClosestCell(getCell(), inRangeArea));
-			return true;
-		}
-		debug("[getInRange] out of range, but not moving (test only)");
-		return false;
-	} else {
+	if (inArray(inRangeArea, getCell())) {
 		debug("[getInRange] already in range");
 		return true;
 	}
+	if (onlyTest) {
+		debug("[getInRange] out of range, but not moving (test only)");
+		return false;
+	}
+	debug("[getInRange] out of range, getting closer");
+	moveTowardCell(getClosestCell(getCell(), inRangeArea));
+	return true;
 }
 
-function performPlan(plan, enemy) {
+function executePlan(plan, enemy) {
 	var results = [];
-	debug("[performPlan] plan=" + itemsToString(plan));
+	debug("[executePlan] plan=" + itemsToString(plan));
 	for (var item in plan) {
 		if (isChip(item)) {
 			push(results, useChip(item, enemy));
 		} else {
 			if (getWeapon() != item) {
-				debug("[performPlan] changing weapon " + getItemName(getWeapon()) + " to " + getItemName(item));
+				debug("[executePlan] changing weapon " + getItemName(getWeapon()) + " to " + getItemName(item));
 				setWeapon(item);
 			}
 			push(results, useWeapon(enemy));
 		}
 	}
-	debug("[performPlan] results=" + arrayMap(results, getResultName));
+	debug("[executePlan] results=" + arrayMap(results, getResultName));
 }
