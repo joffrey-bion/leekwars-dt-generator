@@ -26,9 +26,6 @@ public class TPMap {
     public TPMap(int maxTP) {
         this.maxTP = maxTP;
         this.planSets = new HashMap<>(maxTP);
-        for (int tp = 1; tp <= maxTP; tp++) {
-            planSets.put(tp, new AttackPlansSet());
-        }
         this.normalizedMap = new HashMap<>();
     }
 
@@ -36,7 +33,7 @@ public class TPMap {
         this.maxTP = source.maxTP;
         this.planSets = new HashMap<>(maxTP);
         this.normalizedMap = new HashMap<>();
-        for (int tp = 1; tp <= maxTP; tp++) {
+        for (int tp : source.planSets.keySet()) {
             planSets.put(tp, new AttackPlansSet(source.planSets.get(tp)));
             if (source.isNormalized()) {
                 normalizedMap.put(tp, new AttackPlan(source.normalizedMap.get(tp)));
@@ -45,7 +42,12 @@ public class TPMap {
     }
 
     public void addPlan(int tp, AttackPlan plan) {
-        planSets.get(tp).add(plan);
+        AttackPlansSet set = planSets.get(tp);
+        if (set == null) {
+            set = new AttackPlansSet();
+            planSets.put(tp, set);
+        }
+        set.add(plan);
     }
 
     public void limitPlansTo(Collection<Item> items) {
@@ -56,7 +58,7 @@ public class TPMap {
         normalizedMap.clear();
         int maxDamage = 0;
         AttackPlan currentMaxDamagePlan = AttackPlan.EMPTY;
-        for (int tp = 1; tp <= maxTP; tp++) {
+        for (int tp : planSets.keySet()) {
             AttackPlansSet plansSet = new AttackPlansSet(planSets.get(tp));
 
             for (AttackPlan plan : plansSet) {
@@ -104,7 +106,7 @@ public class TPMap {
 
     public String asCode(String indent) {
         StringBuilder sb = new StringBuilder();
-        for (int tp = 1; tp <= maxTP; tp++) {
+        for (int tp : (isNormalized() ? normalizedMap.keySet() : planSets.keySet())) {
             sb.append(indent);
             sb.append(String.format("%2s", tp)).append(" : ");
             sb.append(isNormalized() ? normalizedMap.get(tp) : planSets.get(tp));
@@ -115,7 +117,7 @@ public class TPMap {
 
     public String toString(String indent) {
         StringBuilder sb = new StringBuilder();
-        for (int tp = 1; tp <= maxTP; tp++) {
+        for (int tp : (isNormalized() ? normalizedMap.keySet() : planSets.keySet())) {
             sb.append(indent);
             sb.append(String.format("%2s", tp)).append(" TP: ");
             sb.append(isNormalized() ? normalizedMap.get(tp) : planSets.get(tp));

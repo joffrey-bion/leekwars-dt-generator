@@ -16,10 +16,12 @@ import com.jbion.leekwars.model.Item;
 import com.jbion.leekwars.model.Weapon;
 
 public class Optimizer {
+    
+    private final int MIN_TP; 
 
-    private List<Weapon> weapons;
-    private List<Item> items;
-    private Map<Integer, AttackPlansSet> allPlansSets;
+    private final List<Weapon> weapons;
+    private final List<Item> items;
+    private final Map<Integer, AttackPlansSet> allPlansSets;
 
     public Optimizer(List<Weapon> weapons, List<Chip> chips) {
         this.weapons = weapons;
@@ -27,6 +29,7 @@ public class Optimizer {
         items.addAll(weapons);
         items.addAll(chips);
         allPlansSets = new HashMap<>();
+        MIN_TP = items.stream().mapToInt(Item::getTPCost).min().orElse(0);
     }
 
     public DecisionTree buildDecisionTree(int maxTP) {
@@ -50,7 +53,7 @@ public class Optimizer {
      */
     private void initializePlansSets(int maxTP) {
         allPlansSets.clear();
-        for (int tp = 1; tp <= maxTP; tp++) {
+        for (int tp = MIN_TP; tp <= maxTP; tp++) {
             allPlansSets.put(tp, getPlansSetForTP(tp));
         }
     }

@@ -2,6 +2,11 @@
 Thumbs.db
 ehthumbs.db
 
+# Eclipse files
+.project
+.settings
+.classpath
+
 # Folder config file
 Desktop.ini
 
@@ -27,7 +32,6 @@ $RECYCLE.BIN/
 
 # Icon must ends with two \r.
 Icon
-
 # Thumbnails
 ._*
 
