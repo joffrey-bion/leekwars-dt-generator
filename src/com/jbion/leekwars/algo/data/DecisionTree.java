@@ -20,20 +20,67 @@ public class DecisionTree extends HashMap<Integer, WeaponMap> {
         return allItemsSorted;
     }
 
-    public List<Item> getUsableItems(int code) {
+    /**
+     * Gets the sublist of items corresponding to the given binary mask, with respect to the
+     * internal list of items of this tree.
+     * <p>
+     * The position of each bit in the mask corresponds to the position of each item in the list
+     * (sorted by item id). The least significant bit corresponds to the first item in the list (the
+     * one with the smallest ID).
+     * <p>
+     * Assume the list of items sorted by ID is [Flame, Spark, Pistol, Shotgun]. The items codes
+     * with respect to this list are then:
+     *
+     * <pre>
+     * getItems(1) = getItems(0b0001) = [Flame]
+     * getItems(4) = getItems(0b0100) = [Pistol]
+     * getItems(5) = getItems(0b0101) = [Flame, Pistol]
+     * getItems(6) = getItems(0b0110) = [Spark, Pistol]
+     * </pre>
+     *
+     * @param mask
+     *            a binary mask where each bit set to 1 means the corresponding item should be
+     *            returned in the output list
+     * @return the list of items selected by the mask. The input mask is the sum of the masks (as
+     *         returned by {@link #getMask(Item)}) of each item in the returned list.
+     * @see #getMask(Item)
+     */
+    public List<Item> getItems(int mask) {
         List<Item> usable = new ArrayList<>();
         int position = 0;
-        while (code > 0 && position < allItemsSorted.size()) {
-            if (code % 2 == 1) {
+        while (mask > 0 && position < allItemsSorted.size()) {
+            if (mask % 2 == 1) {
                 usable.add(allItemsSorted.get(position));
             }
-            code /= 2;
+            mask /= 2;
             position++;
         }
         return usable;
     }
 
-    public int getCode(Item item) {
+    /**
+     * Gets the given item's mask with respect to the list of items of this tree.
+     * <p>
+     * The binary mask of an item has a single bit set to 1. The position of that bit is the
+     * position of the item in the list when the list is sorted by item id. The least significant
+     * bit corresponds to the first item in the list (the one with the smallest ID).
+     * <p>
+     * Assume the list of items sorted by ID is [Flame, Spark, Pistol, Shotgun]. The items' masks
+     * with respect to this list are then:
+     *
+     * <pre>
+     * getMask(Flame)   = 0b0001 = 1
+     * getMask(Spark)   = 0b0010 = 2
+     * getMask(Pistol)  = 0b0100 = 4
+     * getMask(Shotgun) = 0b1000 = 8
+     * </pre>
+     *
+     * @param item
+     *            the item to get the code for
+     * @return the int value of the code of the given item
+     * @see #getItems(int)
+     */
+    public int getMask(Item item) {
         return (int) Math.pow(2, allItemsSorted.indexOf(item));
     }
 
@@ -75,7 +122,7 @@ public class DecisionTree extends HashMap<Integer, WeaponMap> {
         StringBuilder sb = new StringBuilder();
         for (Integer code : keySet()) {
             sb.append(prefix);
-            sb.append("Code ").append(code).append(" : usable=").append(getUsableItems(code));
+            sb.append("Code ").append(code).append(" : usable=").append(getItems(code));
             sb.append(" {\n");
             sb.append(get(code).toString(prefix + "   "));
             sb.append("}\n");

@@ -22,6 +22,6 @@ public class Main {
 
         Optimizer opt = new Optimizer(weapons, chips);
         DecisionTree decisionTree = opt.buildDecisionTree(maxTP);
-        new Generator(decisionTree).generate();
+        new Generator(decisionTree).printLeekscript();
     }
 }

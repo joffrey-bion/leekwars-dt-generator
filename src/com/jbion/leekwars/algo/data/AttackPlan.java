@@ -29,9 +29,18 @@ public class AttackPlan extends ArrayList<Item> {
         });
     }
 
+    /**
+     * Adds the specified item to this AttackPlan. If the item has a cooldown and has already been
+     * used in the plan, this method does nothing and returns false.
+     *
+     * @param item
+     *            the item to add
+     * @return true if the item was actually added, false if it didn't fit in
+     */
     @Override
     public boolean add(Item item) {
         if (item.getCooldown() > 0 && contains(item)) {
+            // the item has a cooldown, we can't use it twice in this attack plan
             return false;
         }
         return super.add(item);
@@ -59,7 +68,7 @@ public class AttackPlan extends ArrayList<Item> {
 
     /**
      * Returns the minimum range necessary to use all items in this plan.
-     * 
+     *
      * @return the minimum range necessary to use all items in this plan.
      */
     public int getMinRange() {
@@ -68,7 +77,7 @@ public class AttackPlan extends ArrayList<Item> {
 
     /**
      * Returns the maximum range necessary to use all items in this plan.
-     * 
+     *
      * @return the maximum range necessary to use all items in this plan.
      */
     public int getMaxRange() {

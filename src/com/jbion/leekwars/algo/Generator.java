@@ -12,29 +12,32 @@ public class Generator {
         this.tree = tree;
     }
 
-    public void generate() {
+    /**
+     * Prints the Leekscript code using this generator's decision tree.
+     */
+    public void printLeekscript() {
         System.out.println("//==============================");
         System.out.println("// GENERATED FILE - DO NOT EDIT");
         System.out.println("//==============================");
         System.out.println();
-        generateAvailableItemsGetter();
+        printAvailableItemsGetter();
         System.out.println();
-        generateGetAttackPlan();
+        printAttackPlanGetter();
         System.out.println();
-        generateItemsToCode();
+        printItemsToCodeFunction();
         System.out.println();
         generateCodeToItems();
         System.out.println();
         System.out.println("global tree = " + tree.asCode("") + ";");
     }
 
-    private static void generateGetAttackPlan() {
+    private static void printAttackPlanGetter() {
         System.out.println("function getAttackPlan(maxTP, usableItems) {");
         System.out.println("\tvar usableItemsCode = itemsToCode(usableItems, true);");
         System.out.println("\treturn tree[usableItemsCode][getWeapon()][maxTP];\n}");
     }
 
-    private static void generateAvailableItemsGetter() {
+    private static void printAvailableItemsGetter() {
         System.out.println("global AVAILABLE_ITEMS = null;");
         System.out.println();
         System.out.println("function getAvailableItems() {");
@@ -48,14 +51,14 @@ public class Generator {
         System.out.println("}");
     }
 
-    private void generateItemsToCode() {
+    private void printItemsToCodeFunction() {
         System.out.println("function itemsToCode(items, displayErrors) {");
         System.out.println("\tvar code = 0;");
         System.out.println("\tfor (var item in items) {");
         System.out.print("\t\t");
         for (Item item : tree.getItems()) {
             System.out.println("if (item == " + item + ") {");
-            System.out.println("\t\t\tcode += " + tree.getCode(item) + ";");
+            System.out.println("\t\t\tcode += " + tree.getMask(item) + ";");
             System.out.print("\t\t} else ");
         }
         System.out.println("if (displayErrors) {");
@@ -71,7 +74,7 @@ public class Generator {
         System.out.println("function codeToItems(code) {");
         System.out.println("\tvar items = [];");
         for (Item item : tree.getItems()) {
-            System.out.println("\tif (code & " + tree.getCode(item) + ") {");
+            System.out.println("\tif (code & " + tree.getMask(item) + ") {");
             System.out.println("\t\tpush(items, " + item + ");");
             System.out.println("\t}");
         }
