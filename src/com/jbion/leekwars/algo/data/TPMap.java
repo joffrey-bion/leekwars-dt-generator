@@ -105,12 +105,16 @@ public class TPMap {
     }
 
     public String asCode(String indent) {
+        final String NL = indent == null ? "" : "\n";
+        final String SP = indent == null ? "" : " ";
         StringBuilder sb = new StringBuilder();
         for (int tp : (isNormalized() ? normalizedMap.keySet() : planSets.keySet())) {
-            sb.append(indent);
-            sb.append(String.format("%2s", tp)).append(" : ");
-            sb.append(isNormalized() ? normalizedMap.get(tp) : planSets.get(tp));
-            sb.append(",\n");
+            if (indent != null) {
+                sb.append(indent);
+            }
+            sb.append(indent == null ? tp : String.format("%2s", tp)).append(SP + ":" + SP);
+            sb.append(isNormalized() ? normalizedMap.get(tp).asCode(indent != null) : planSets.get(tp));
+            sb.append("," + NL);
         }
         return sb.deleteCharAt(sb.lastIndexOf(",")).toString();
     }

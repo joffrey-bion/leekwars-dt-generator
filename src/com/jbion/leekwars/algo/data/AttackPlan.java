@@ -105,4 +105,18 @@ public class AttackPlan extends ArrayList<Item> {
         // very tolerant, but it does not matter
         return stream().mapToInt(i -> i.hashCode()).sum();
     }
+
+    public String asCode(boolean withSpaces) {
+        final String SP = withSpaces ? " " : "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (Item item : this) {
+            sb.append(item.getId());
+            sb.append("," + SP);
+        }
+        if (!isEmpty()) {
+            sb.delete(sb.lastIndexOf(","), sb.length());
+        }
+        return sb.append("]").toString();
+    }
 }

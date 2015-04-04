@@ -33,19 +33,25 @@ public class WeaponMap extends HashMap<Weapon, TPMap> {
         }
     }
 
-    public String asCode() {
-        return asCode("");
-    }
-
     public String asCode(String indent) {
+        final String NL = indent == null ? "" : "\n";
+        final String SP = indent == null ? "" : " ";
         StringBuilder sb = new StringBuilder();
         for (Weapon weapon : weapons) {
-            sb.append(indent);
-            sb.append(weapon).append(" : [\n");
-            sb.append(get(weapon).asCode(indent + "\t"));
-            sb.append(indent).append("],\n");
+            if (indent != null) {
+                sb.append(indent);
+            }
+            sb.append(weapon.getId()).append(SP + ":" + SP + "[" + NL);
+            sb.append(get(weapon).asCode(indent == null ? null : indent + "\t"));
+            if (indent != null) {
+                sb.append(indent);
+            }
+            sb.append("]," + NL);
         }
-        return sb.deleteCharAt(sb.lastIndexOf(",")).toString();
+        if (!weapons.isEmpty()) {
+            sb.deleteCharAt(sb.lastIndexOf(","));
+        }
+        return sb.toString();
     }
 
     @Override

@@ -17,7 +17,7 @@ public class Generator {
         System.out.println("// GENERATED FILE - DO NOT EDIT");
         System.out.println("//==============================");
         System.out.println();
-        generateEnumerateFunction();
+        generateAvailableItemsGetter();
         System.out.println();
         generateGetAttackPlan();
         System.out.println();
@@ -34,25 +34,17 @@ public class Generator {
         System.out.println("\treturn tree[usableItemsCode][getWeapon()][maxTP];\n}");
     }
 
-    private void generateEnumerateFunction() {
-        int max = (int) Math.pow(2, tree.getItems().size());
-        System.out.println("global availableItemsCombinations = null;");
+    private static void generateAvailableItemsGetter() {
+        System.out.println("global AVAILABLE_ITEMS = null;");
         System.out.println();
-        System.out.println("function getAllItemCombinations() {");
-        System.out.println("\tif (availableItemsCombinations == null) {");
-        System.out.println("\t\tvar availableItems = getWeapons();");
-        System.out.println("\t\tpushAll(availableItems, getChips());");
-        System.out.println("\t\tvar itemsMask = itemsToCode(availableItems, false);");
-        System.out.println("\t\tavailableItemsCombinations = [];");
-        System.out.println("\t\t// combinations with more items first");
-        System.out.println("\t\tfor (var code = 15; code > 0; code--) {");
-        System.out.println("\t\t\tvar items = codeToItems(code);");
-        System.out.println("\t\t\tif ((code & itemsMask) == code) {");
-        System.out.println("\t\t\t\tpush(availableItemsCombinations, items);");
-        System.out.println("\t\t\t}");
-        System.out.println("\t\t}");
+        System.out.println("function getAvailableItems() {");
+        System.out.println("\tif (AVAILABLE_ITEMS == null) {");
+        System.out.println("\t\tvar equippedItems = getWeapons();");
+        System.out.println("\t\tpushAll(equippedItems, getChips());");
+        System.out.println("\t\tvar equippedItemsFilteredCode = itemsToCode(equippedItems, false);");
+        System.out.println("\t\tAVAILABLE_ITEMS = codeToItems(equippedItemsFilteredCode);");
         System.out.println("\t}");
-        System.out.println("\treturn availableItemsCombinations;");
+        System.out.println("\treturn AVAILABLE_ITEMS;");
         System.out.println("}");
     }
 

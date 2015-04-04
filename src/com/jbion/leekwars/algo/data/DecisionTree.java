@@ -8,14 +8,14 @@ import java.util.stream.Collectors;
 
 import com.jbion.leekwars.model.Item;
 
-public class DecisionTree extends HashMap<Integer, WeaponMap>{
-    
+public class DecisionTree extends HashMap<Integer, WeaponMap> {
+
     private List<Item> allItemsSorted;
-    
+
     public DecisionTree(List<Item> allItems) {
         allItemsSorted = allItems.stream().sorted(Comparator.comparingInt(Item::getId)).collect(Collectors.toList());
     }
-    
+
     public List<Item> getItems() {
         return allItemsSorted;
     }
@@ -32,25 +32,37 @@ public class DecisionTree extends HashMap<Integer, WeaponMap>{
         }
         return usable;
     }
-    
+
     public int getCode(Item item) {
         return (int) Math.pow(2, allItemsSorted.indexOf(item));
     }
 
-    public String asCode() {
-        return asCode("");
-    }
-
     public String asCode(String indent) {
+        final String NL = indent == null ? "" : "\n";
+        final String SP = indent == null ? "" : " ";
+        final String subIndent = indent == null ? null : indent + "\t";
+        final String subSubIndent = subIndent == null ? null : subIndent + "\t";
         StringBuilder sb = new StringBuilder();
-        sb.append(indent).append("[\n");
+        if (indent != null) {
+            sb.append(indent);
+        }
+        sb.append("[" + NL);
         for (Integer code : keySet()) {
-            sb.append(indent).append("\t").append(code).append(" : [\n");
-            sb.append(get(code).asCode(indent + "\t\t"));
-            sb.append(indent).append("\t],\n");
+            if (subIndent != null) {
+                sb.append(subIndent);
+            }
+            sb.append(code).append(SP + ":" + SP + "[" + NL);
+            sb.append(get(code).asCode(subSubIndent));
+            if (subIndent != null) {
+                sb.append(subIndent);
+            }
+            sb.append("]," + NL);
         }
         sb.deleteCharAt(sb.lastIndexOf(","));
-        sb.append(indent).append("]");
+        if (indent != null) {
+            sb.append(indent);
+        }
+        sb.append("]");
         return sb.toString();
     }
 

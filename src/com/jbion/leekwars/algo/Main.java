@@ -5,19 +5,14 @@ import java.util.List;
 
 import com.jbion.leekwars.algo.data.DecisionTree;
 import com.jbion.leekwars.model.Chip;
-import com.jbion.leekwars.model.Item;
 import com.jbion.leekwars.model.Weapon;
 
 public class Main {
 
     public static void main(String[] args) {
-
         int maxTP = 13;
 
         List<Weapon> weapons = new ArrayList<>();
-        weapons.add(Weapon.PISTOL);
-        weapons.add(Weapon.DOUBLE_GUN);
-        weapons.add(Weapon.SHOTGUN);
         weapons.add(Weapon.MAGNUM);
         weapons.add(Weapon.LASER);
         weapons.add(Weapon.GRENADE_LAUNCHER);
