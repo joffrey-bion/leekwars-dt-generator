@@ -1,7 +1,7 @@
-package com.jbion.leekwars.algo;
+package org.hildan.leekwars.algo;
 
-import com.jbion.leekwars.algo.data.DecisionTree;
-import com.jbion.leekwars.model.Item;
+import org.hildan.leekwars.algo.data.DecisionTree;
+import org.hildan.leekwars.model.Item;
 
 public class Generator {
 

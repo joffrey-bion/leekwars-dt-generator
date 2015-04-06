@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+group = 'org.hildan'
+version = '1.0'
+sourceCompatibility = '1.8'
+
+mainClassName = "org.hildan.leekwars.algo.Main"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.+'
+}

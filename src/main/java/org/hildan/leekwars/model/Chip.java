@@ -1,4 +1,4 @@
-package com.jbion.leekwars.model;
+package org.hildan.leekwars.model;
 
 public class Chip extends Item {
     

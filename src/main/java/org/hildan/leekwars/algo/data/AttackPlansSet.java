@@ -1,11 +1,11 @@
-package com.jbion.leekwars.algo.data;
+package org.hildan.leekwars.algo.data;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jbion.leekwars.model.Item;
+import org.hildan.leekwars.model.Item;
 
 public class AttackPlansSet extends HashSet<AttackPlan> {
 

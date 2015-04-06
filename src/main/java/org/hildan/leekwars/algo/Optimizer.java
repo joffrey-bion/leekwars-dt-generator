@@ -1,4 +1,4 @@
-package com.jbion.leekwars.algo;
+package org.hildan.leekwars.algo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.jbion.leekwars.algo.data.AttackPlan;
-import com.jbion.leekwars.algo.data.AttackPlansSet;
-import com.jbion.leekwars.algo.data.DecisionTree;
-import com.jbion.leekwars.algo.data.TPMap;
-import com.jbion.leekwars.algo.data.WeaponMap;
-import com.jbion.leekwars.model.Chip;
-import com.jbion.leekwars.model.Item;
-import com.jbion.leekwars.model.Weapon;
+import org.hildan.leekwars.algo.data.AttackPlan;
+import org.hildan.leekwars.algo.data.AttackPlansSet;
+import org.hildan.leekwars.algo.data.DecisionTree;
+import org.hildan.leekwars.algo.data.TPMap;
+import org.hildan.leekwars.algo.data.WeaponMap;
+import org.hildan.leekwars.model.Chip;
+import org.hildan.leekwars.model.Item;
+import org.hildan.leekwars.model.Weapon;
 
 public class Optimizer {
 

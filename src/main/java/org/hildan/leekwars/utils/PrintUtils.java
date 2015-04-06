@@ -1,4 +1,4 @@
-package com.jbion.leekwars.utils;
+package org.hildan.leekwars.utils;
 
 public class PrintUtils {
 

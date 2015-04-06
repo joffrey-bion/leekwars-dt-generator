@@ -1,11 +1,11 @@
-package com.jbion.leekwars.algo;
+package org.hildan.leekwars.algo;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jbion.leekwars.algo.data.DecisionTree;
-import com.jbion.leekwars.model.Chip;
-import com.jbion.leekwars.model.Weapon;
+import org.hildan.leekwars.algo.data.DecisionTree;
+import org.hildan.leekwars.model.Chip;
+import org.hildan.leekwars.model.Weapon;
 
 public class Main {
 

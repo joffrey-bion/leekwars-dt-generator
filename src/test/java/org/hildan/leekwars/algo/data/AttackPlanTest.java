@@ -1,11 +1,11 @@
-package com.jbion.leekwars.algo.data;
+package org.hildan.leekwars.algo.data;
 
 import static org.junit.Assert.*;
 
+import org.hildan.leekwars.algo.data.AttackPlan;
+import org.hildan.leekwars.model.Chip;
+import org.hildan.leekwars.model.Weapon;
 import org.junit.Test;
-
-import com.jbion.leekwars.model.Chip;
-import com.jbion.leekwars.model.Weapon;
 
 public class AttackPlanTest {
 

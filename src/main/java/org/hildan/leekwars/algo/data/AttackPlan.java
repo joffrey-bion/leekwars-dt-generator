@@ -1,12 +1,12 @@
-package com.jbion.leekwars.algo.data;
+package org.hildan.leekwars.algo.data;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collector;
 
-import com.jbion.leekwars.model.Item;
-import com.jbion.leekwars.model.Weapon;
+import org.hildan.leekwars.model.Item;
+import org.hildan.leekwars.model.Weapon;
 
 /**
  * Represents a list of items to be used in one single turn. Items may appear multiple times if they

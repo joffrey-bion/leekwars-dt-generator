@@ -1,10 +1,10 @@
-package com.jbion.leekwars.algo.data;
+package org.hildan.leekwars.algo.data;
 
 import java.util.HashMap;
 import java.util.List;
 
-import com.jbion.leekwars.model.Item;
-import com.jbion.leekwars.model.Weapon;
+import org.hildan.leekwars.model.Item;
+import org.hildan.leekwars.model.Weapon;
 
 public class WeaponMap extends HashMap<Weapon, TPMap> {
 

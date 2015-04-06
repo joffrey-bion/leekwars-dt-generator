@@ -1,4 +1,4 @@
-package com.jbion.leekwars.algo.data;
+package org.hildan.leekwars.algo.data;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jbion.leekwars.model.Item;
+import org.hildan.leekwars.model.Item;
 
 public class DecisionTree extends HashMap<Integer, WeaponMap> {
 

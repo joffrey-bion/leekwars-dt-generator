@@ -1,11 +1,11 @@
-package com.jbion.leekwars.algo.data;
+package org.hildan.leekwars.algo.data;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.jbion.leekwars.model.Item;
-import com.jbion.leekwars.model.Weapon;
+import org.hildan.leekwars.model.Item;
+import org.hildan.leekwars.model.Weapon;
 
 /**
  * A map between TP amounts and attack plans.
